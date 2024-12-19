@@ -15,7 +15,6 @@ import { Meta } from '@angular/platform-browser';
 })
 export class AppComponent implements OnInit {
   BoardModel: Board = {} as Board;
-  firstGameNumber = 1;
   lastGameNumber = 200;
   gameNumber: any;
   isSuccess = false;
@@ -48,7 +47,7 @@ export class AppComponent implements OnInit {
 
     //this.WriteSitemap();
     this.cachelstSolution = this.storage.get(LocaleStorageEnum.SOLVED) || [];
-    for (let i = this.lastGameNumber; i >= this.firstGameNumber; i--) {
+    for (let i = this.lastGameNumber; i >= 1; i--) {
       const isSolved = this.cachelstSolution.find(k => k.Id === i);
       const item = {} as Game;
       item.Id = i;
@@ -104,7 +103,7 @@ export class AppComponent implements OnInit {
 
   WriteSitemap() {
     let urls = '';
-    for (let i = this.lastGameNumber; i >= this.firstGameNumber; i--) {
+    for (let i = this.lastGameNumber; i >= 1; i--) {
       urls += `
  <url>
  <loc>https://queens.bfn.tr/#${i}</loc>
@@ -714,13 +713,13 @@ ${urls}
 
     const lstUnPlayedGame = this.lstSolution.filter(s => s.IsSolution === false);
     if (lstUnPlayedGame.length === 0) {
-      this.gameNumber = this.RandomNumber(this.firstGameNumber, this.lastGameNumber);
+      this.gameNumber = this.RandomNumber(1, this.lastGameNumber);
       this.LoadGame();
       this.ChangeMeta();
     }
 
     while (game.IsSolution) {
-      this.gameNumber = this.RandomNumber(this.firstGameNumber, this.lastGameNumber);
+      this.gameNumber = this.RandomNumber(1, this.lastGameNumber);
       game = this.lstSolution.find(k => k.Id === this.gameNumber);
     }
     this.LoadGame();
@@ -732,40 +731,53 @@ ${urls}
   }
 
   LoadGame() {
-    if (this.gameNumber < this.firstGameNumber) {
+    if (this.gameNumber < 1) {
       this.gameNumber = this.lastGameNumber;
     }
     this.storage.set(LocaleStorageEnum.GAME, this.gameNumber);
     this.message = null;
-    this.services.Get(`assets/data/${this.gameNumber}.json`).then((data: Board) => {
 
-      let id = 0;
-      for (let i = 0; i < data.Colors.length; i++) {
-        for (let a = 0; a < data.Colors[i].length; a++) {
-          id++;
-          data.Colors[i][a].id = id;
-          data.Colors[i][a].row = i;
-          data.Colors[i][a].column = a;
-          data.Colors[i][a].isCheck = 0;
-          data.Colors[i][a].isError = false;
-          data.Colors[i][a].ScreenX = 0;
-          data.Colors[i][a].ScreenY = 0;
-          data.Colors[i][a].ScreenXMax = 0;
-          data.Colors[i][a].ScreenYMax = 0;
-          data.Colors[i][a].IsAutoCheck = false;
-          data.Colors[i][a].BorderTop = false;
-          data.Colors[i][a].BorderRight = false;
-
-        }
-      }
-      data.IsSolved = this.cachelstSolution.some(k => k.Id === this.gameNumber);
-      this.BoardModel = data;
+    const game = this.storage.getObject<Board>(LocaleStorageEnum.GAME_ + this.gameNumber);
+    console.log(game);
+    if (game !== null && game !== undefined && game.Colors !== undefined) {
+      game.IsSolved = this.cachelstSolution.some(k => k.Id === this.gameNumber);
+      this.BoardModel = game;
       this.MakeBorder();
       this.isSuccess = false;
+    }
+    else {
+      this.services.Get(`assets/data/${this.gameNumber}.json`).then((data: Board) => {
+        let id = 0;
+        for (let i = 0; i < data.Colors.length; i++) {
+          for (let a = 0; a < data.Colors[i].length; a++) {
+            id++;
+            data.Colors[i][a].id = id;
+            data.Colors[i][a].row = i;
+            data.Colors[i][a].column = a;
+            data.Colors[i][a].isCheck = 0;
+            data.Colors[i][a].isError = false;
+            data.Colors[i][a].ScreenX = 0;
+            data.Colors[i][a].ScreenY = 0;
+            data.Colors[i][a].ScreenXMax = 0;
+            data.Colors[i][a].ScreenYMax = 0;
+            data.Colors[i][a].IsAutoCheck = false;
+            data.Colors[i][a].BorderTop = false;
+            data.Colors[i][a].BorderRight = false;
 
-    }).catch(err => {
-      this.message = 'Error: ' + JSON.stringify(err);
-    });
+          }
+        }
+        data.IsSolved = this.cachelstSolution.some(k => k.Id === this.gameNumber);
+        this.BoardModel = data;
+        this.storage.set(LocaleStorageEnum.GAME_ + this.gameNumber, data);
+        this.MakeBorder();
+        this.isSuccess = false;
+
+      }).catch(err => {
+        this.message = 'Error: ' + JSON.stringify(err);
+      });
+    }
+
+
 
     this.CalcCoordinates();
 

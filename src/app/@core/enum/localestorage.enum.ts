@@ -1,5 +1,6 @@
 export enum LocaleStorageEnum {
   GAME = 'GAME',
   SOLVED = 'SOLVED',
-  AUTOX = 'AUTOX'
+  AUTOX = 'AUTOX',
+  GAME_ = 'GAME_'
 }
