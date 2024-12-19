@@ -1,0 +1,207 @@
+<header>
+  <div class="container">
+    <img src="assets/img/logo.svg" alt="Queens Game" />
+  </div>
+</header>
+<main>
+
+  <ng-container *ngIf="isGameList">
+    <!-- Game List -->
+    <div class="container"
+      [ngClass]="{'success': isSuccess, 'is-mobile' : isMobile}">
+
+      <h1><span class="show-game-list"
+          [ngClass]="{'solved': BoardModel.IsSolved}"
+          (click)="HideGameList()"><span
+            *ngIf="BoardModel.IsSolved">✔️</span><span
+            *ngIf="!BoardModel.IsSolved">#</span>{{BoardModel.Id}}</span>
+        <button class="btn" (click)="HideGameList()">Close</button>
+      </h1>
+
+      <div class="game-list" *ngIf="isGameList">
+        <div *ngFor="let item of lstSolution" (click)="GoGame(item.Id)"
+          [ngClass]="{'active': item.IsSolution}" [innerHtml]="item.Id"></div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <ng-container *ngIf="!isGameList">
+
+    <ng-container *ngIf="!isEdit">
+      <ng-container *ngIf="isSettingsPage">
+        <div class="container">
+
+          <h1 class="top">
+            <span class="show-game-list">Settings</span>
+            <button class="btn" *ngIf="!isSuccess"
+              (click)="CloseSettings()">Close</button>
+
+            <!-- <div *ngIf="isShowSettingModal" class="settings">
+            <div class="inner-content">
+
+            </div>
+          </div>
+          <div *ngIf="isShowSettingModal" class="settings-bg"
+            (click)="CloseSettings()">
+          </div> -->
+          </h1>
+          <div style="height: 80%;width: 100%;">
+            <div class="switch-control">
+              <input type="checkbox" id="switch_autoX" [(ngModel)]="autoX"
+                (ngModelChange)="ChangeAutoX()" />
+              <label for="switch_autoX">Auto X
+              </label>
+            </div>
+            <br>
+            <button class="btn"
+              style="float:none;margin-left:0;margin-top:10px;"
+              (click)="ClearCache()">Clear
+              Cache</button>
+            <p>(All played games will be cleared!!)</p>
+            <br>
+          </div>
+
+          <span class="message" *ngIf="!!message">{{message}}</span>
+
+        </div>
+      </ng-container>
+      <ng-container *ngIf="!isSettingsPage">
+        <div class="container"
+          [ngClass]="{'success': isSuccess, 'is-mobile' : isMobile}">
+
+          <h1 *ngIf="!isSuccess" class="top">
+            <span class="show-game-list"
+              [ngClass]="{'solved': BoardModel.IsSolved}"
+              (click)="ShowGameList()"><span
+                *ngIf="BoardModel.IsSolved">👍</span><span
+                *ngIf="!BoardModel.IsSolved">#</span>{{BoardModel.Id}}</span>
+
+            <button class="btn" *ngIf="!isSuccess" (click)="ShowGameList()">Game
+              List</button>
+            <button class="btn" *ngIf="!isSuccess"
+              (click)="ShowSettings()">Settings</button>
+
+          </h1>
+
+          <div class="board" *ngIf="!isSuccess"
+            [style]=" '--rows: ' + BoardModel.Size + ' ; --cols: ' + BoardModel.Size + ';'">
+            <ng-container *ngFor="let row of BoardModel.Colors; index as i;">
+              <div *ngFor="let item of row; index as i2;"
+                [class]=" 'cor_' + i + '_' + i2 + ' cell color' + item.color"
+                [ngClass]="{'notQueen': item.isCheck === 1, 'Queeng' : item.isCheck === 2,'error': item.isError, 'border-top': item.BorderTop, 'border-right': item.BorderRight}"
+                (mousedown)="DownEvent(item)" (mouseup)="UpEvent(item)"
+                (mouseover)="OverEvent(item)">
+                <ng-container *ngIf="item.isCheck === 2">
+                  <img src="/assets/img/crown-icon.svg" width="25px"
+                    alt="crown" />
+                </ng-container>
+                <ng-container *ngIf="item.isCheck === 1">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M10.875 4.25L8 7.125L5.125 4.25L4.25 5.125L7.125 8L4.25 10.875L5.125 11.75L8 8.875L10.875 11.75L11.75 10.875L8.875 8L11.75 5.125L10.875 4.25Z"
+                      fill="black" fill-opacity="0.75"></path>
+                  </svg>
+                </ng-container>
+              </div>
+            </ng-container>
+          </div>
+
+          <div class="board-success" *ngIf="isSuccess">
+            <!--<img src="/assets/img/confetti.gif" class="confetti">
+            <img src="/assets/img/crown.svg" alt="Taç"
+              class="align-items-center"> -->
+            <span>Queens #{{BoardModel.Id}}</span>
+            <h1>You are doing very well!</h1>
+
+            <button (click)="Next()">Previous</button>
+            <button (click)="RandomGame()">Random</button>
+          </div>
+          <h1 *ngIf="!isSuccess"
+            style="display: flex; justify-content: space-between;">
+            <button class="btn" *ngIf="!isSuccess" style="margin:0;"
+              (click)="ClearGame()">Clear</button>
+            <button class="btn" *ngIf="!isSuccess" (click)="Hint()"
+              [disabled]="!isActiveHintButton">Hint
+              (x)</button>
+            <button class="btn" *ngIf="!isSuccess"
+              (click)="RandomGame()">Random</button>
+
+          </h1>
+
+          <span class="message" *ngIf="!!message">{{message}}</span>
+
+        </div>
+      </ng-container>
+
+    </ng-container>
+
+    <ng-container *ngIf="isEdit">
+      <div class="container">
+        <div class="board"
+          [style]=" '--rows: ' + BoardModel.Size + ' ; --cols: ' + BoardModel.Size + ';'">
+          <ng-container *ngFor="let row of BoardModel.Colors">
+            <div class="cell" *ngFor="let item of row"
+              [class]="'color' + item.color"
+              [ngClass]="{'Queeng' : item.isQueen}"
+              (mousedown)="DownEventSetCell(item)" (mouseup)="UpEventSetCell()"
+              (mouseover)="OverEventSetCell(item)">
+              <ng-container *ngIf="item.isQueen">
+                <svg class="queens-icon-svg" width="24" height="24"
+                  viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <title>Queen</title>
+                  <g clip-path="url(#clip0_3812_70403)">
+                    <path
+                      d="M23.25 7C23.25 7.69 22.69 8.25 22 8.25C21.89 8.25 21.78 8.21 21.68 8.18L19 17.99H5L2.32 8.18C2.21 8.21 2.11 8.25 2 8.25C1.31 8.25 0.75 7.69 0.75 7C0.75 6.31 1.31 5.75 2 5.75C2.69 5.75 3.25 6.31 3.25 7C3.25 7.31 3.13 7.59 2.94 7.8L9 13L11.65 4.18C11.14 4.03 10.75 3.57 10.75 3C10.75 2.31 11.31 1.75 12 1.75C12.69 1.75 13.25 2.31 13.25 3C13.25 3.56 12.87 4.02 12.35 4.18L15 13L21.06 7.8C20.87 7.58 20.75 7.31 20.75 7C20.75 6.31 21.31 5.75 22 5.75C22.69 5.75 23.25 6.31 23.25 7ZM19 19H5C4.45 19 4 19.45 4 20C4 20.55 4.45 21 5 21H19C19.55 21 20 20.55 20 20C20 19.45 19.55 19 19 19Z">
+                    </path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0_3812_70403">
+                      <rect width="24" height="24" fill="white"></rect>
+                    </clipPath>
+                  </defs>
+                </svg>
+              </ng-container>
+            </div>
+          </ng-container>
+        </div>
+        <div class="forms">
+          <div><span style="width: 80px;display: inline-block;">Id :
+            </span><input type="number" max="999999" min="1"
+              [(ngModel)]="BoardModel.Id" placeholder="#Id" /></div>
+          <div><span style="width: 80px;display: inline-block;">Size:</span>
+            <input type="number" max="17" min="1" [(ngModel)]="BoardModel.Size"
+              (click)="ChangeSize()" />
+          </div>
+          <div class="colors">
+            <div [class]="'color' + item"
+              *ngFor="let item of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16]"
+              (click)="SetColor(item)"></div>
+            <div (click)="SetColor(99)"><svg class="queens-icon-svg" width="24"
+                height="24" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg">
+                <title>Queen</title>
+                <g clip-path="url(#clip0_3812_70403)">
+                  <path
+                    d="M23.25 7C23.25 7.69 22.69 8.25 22 8.25C21.89 8.25 21.78 8.21 21.68 8.18L19 17.99H5L2.32 8.18C2.21 8.21 2.11 8.25 2 8.25C1.31 8.25 0.75 7.69 0.75 7C0.75 6.31 1.31 5.75 2 5.75C2.69 5.75 3.25 6.31 3.25 7C3.25 7.31 3.13 7.59 2.94 7.8L9 13L11.65 4.18C11.14 4.03 10.75 3.57 10.75 3C10.75 2.31 11.31 1.75 12 1.75C12.69 1.75 13.25 2.31 13.25 3C13.25 3.56 12.87 4.02 12.35 4.18L15 13L21.06 7.8C20.87 7.58 20.75 7.31 20.75 7C20.75 6.31 21.31 5.75 22 5.75C22.69 5.75 23.25 6.31 23.25 7ZM19 19H5C4.45 19 4 19.45 4 20C4 20.55 4.45 21 5 21H19C19.55 21 20 20.55 20 20C20 19.45 19.55 19 19 19Z">
+                  </path>
+                </g>
+                <defs>
+                  <clipPath id="clip0_3812_70403">
+                    <rect width="24" height="24" fill="white"></rect>
+                  </clipPath>
+                </defs>
+              </svg></div>
+          </div>
+          <button (click)="Save()">Save</button>
+        </div>
+      </div>
+    </ng-container>
+
+  </ng-container>
+
+  <div class="left-button-1"></div>
+  <div class="left-button-2"></div>
+  <div class="right-button"></div>
+</main>

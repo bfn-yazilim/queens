@@ -1,0 +1,45 @@
+{
+  "workbench.editor.enablePreview": true,
+  "files.exclude": {
+    "**/.angular": true,
+    "**/.git": true,
+    //"**/node_modules": true,
+    "**/.browserslistrc": true,
+    //"**/.gitignore": true,
+    "**/.editorconfig": true,
+    "**/package-lock.json": true,
+    //"**/package.json": true,
+    //"**/angular.json": true,
+    "**/karma.conf.js": true,
+    "**/tsconfig.app.json": true,
+    "**/tsconfig.spec.json": true,
+    "**/tsconfig.json": true,
+    "**/src/polyfills.ts": true,
+    "**/src/test.ts": true,
+    //"**/dist": true,
+    "**/.prettierrc": true
+    //"**/.eslintrc.js": true
+  },
+  "editor.accessibilitySupport": "off",
+  "html.hover.documentation": false,
+  "html.hover.references": false,
+  "css.hover.references": false,
+  "css.hover.documentation": false,
+  "less.hover.references": false,
+  "less.hover.documentation": false,
+  "scss.hover.references": false,
+  "scss.hover.documentation": false,
+  "explorer.confirmDelete": false,
+  "editor.formatOnSave": true,
+  "editor.fontFamily": "Cascadia Code",
+  "editor.fontLigatures": true,
+  "terminal.integrated.fontFamily": "Consolas, monospace",
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "csharpToTypeScript.toCamelCase": false,
+  "editor.codeLensFontFamily": "Cascadia Code"
+}
